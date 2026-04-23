@@ -1,22 +1,64 @@
 const fs = require("fs");
+const path = require("path");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
+
+const SCHEMA_PATH = path.resolve(__dirname, "chess.schema.json");
+const INPUT_DIR = path.resolve(__dirname, "inputs");
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-const schema = JSON.parse(fs.readFileSync("./chess.schema.json", "utf-8"));
-
-const validate = ajv.compile(schema);
-
-/* the file with the JSON data to validate */
-const data = JSON.parse(fs.readFileSync("./example.json", "utf-8"));
-
-const valid = validate(data);
-
-if (valid) {
-  console.log("JSON is valid!");
-} else {
-  console.log("Errors:");
-  console.log(validate.errors);
+function loadJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
+
+function getJsonFilesFromInputDir(inputDir) {
+  if (!fs.existsSync(inputDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(inputDir)
+    .filter((fileName) => fileName.toLowerCase().endsWith(".json"));
+}
+
+function formatAjvErrors(errors = []) {
+  return errors
+    .map((error) => {
+      const location = error.instancePath || "/";
+      return `${location} ${error.message}`;
+    })
+    .join("; ");
+}
+
+function main() {
+  const schema = loadJson(SCHEMA_PATH);
+  const validate = ajv.compile(schema);
+
+  const jsonFiles = getJsonFilesFromInputDir(INPUT_DIR);
+
+  if (jsonFiles.length === 0) {
+    console.log(`No JSON files found in folder: ${INPUT_DIR}`);
+    return;
+  }
+
+  jsonFiles.forEach((fileName) => {
+    const filePath = path.join(INPUT_DIR, fileName);
+
+    try {
+      const data = loadJson(filePath);
+      const valid = validate(data);
+
+      if (valid) {
+        console.log(`${fileName} -> VALID`);
+      } else {
+        console.log(`${fileName} -> INVALID (${formatAjvErrors(validate.errors)})`);
+      }
+    } catch (error) {
+      console.log(`${fileName} -> INVALID JSON (${error.message})`);
+    }
+  });
+}
+
+main();
