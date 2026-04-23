@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "match",
     "$id": "/match.schema.json",
     "type": "object",
@@ -74,11 +74,11 @@
                     "minimum": 1
                 },
                 "white": {
-                    "type": "string",
+                    "type": ["string", "null"],
                     "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
                 },
                 "black": {
-                    "type": "string",
+                    "type": ["string", "null"],
                     "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
                 },
                 "comment": {
