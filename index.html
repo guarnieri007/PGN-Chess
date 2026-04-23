@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON PGN validator</title>
+  <script src="https://cdn.jsdelivr.net/npm/ajv/dist/ajv.min.js"></script>
+</head>
+<body>
+  <h1>JSON PGN validator</h1>
+  <textarea id="jsonInput" rows="15" cols="80" placeholder="Paste your JSON here"></textarea><br>
+  <button onclick="validateJSON()">Validate</button>
+  <pre id="output"></pre>
+
+  <script>
+    let schema;
+
+    fetch("./chess.schema.json")
+      .then(response => response.json())
+      .then(data => { schema = data; })
+      .catch(err => console.error("Error loading schema:", err));
+
+    function validateJSON() {
+      if (!schema) {
+        document.getElementById("output").textContent = "Schema still not loaded.";
+        return;
+      }
+
+      const ajv = new Ajv({ allErrors: true });
+      const validate = ajv.compile(schema);
+      const input = document.getElementById("jsonInput").value;
+      let data;
+      try {
+        data = JSON.parse(input);
+      } catch (e) {
+        document.getElementById("output").textContent = "Error: Invalid JSON.";
+        return;
+      }
+      const valid = validate(data);
+      if (valid) {
+        document.getElementById("output").textContent = "Valid JSON!";
+      } else {
+        document.getElementById("output").textContent = "Errors:\n" + JSON.stringify(validate.errors, null, 2);
+      }
+    }
+  </script>
+</body>
+</html>

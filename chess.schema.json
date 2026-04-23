@@ -1,0 +1,99 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "match",
+    "$id": "/match.schema.json",
+    "type": "object",
+    "properties": {
+        "event": {
+            "type": "string"
+        },
+        "site": {
+            "type": "string"
+        },
+        "date": {
+            "type": "string",
+            "pattern": "^[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}$"
+        },
+        "round": {
+            "type": "string"
+        },
+        "white": {
+            "type": "string"
+        },
+        "black": {
+            "type": "string"
+        },
+        "result": {
+            "type": "string",
+            "enum": [
+                "1-0",
+                "0-1",
+                "1/2-1/2"
+            ]
+        },
+        "blackElo": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "whiteElo": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "termination": {
+            "type": "string"
+        },
+        "eco": {
+            "type": "string",
+            "pattern": "^[A-E][0-9]{2}$"
+        },
+        "endDate": {
+            "type": "string",
+            "pattern": "^[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}$"
+        },
+        "link": {
+            "type": "string",
+            "format": "uri"
+        },
+        "moves": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/move"
+            }
+        }
+    },
+    "required": [
+        "moves",
+        "result"
+    ],
+    "$defs": {
+        "move": {
+            "type": "object",
+            "properties": {
+                "turn": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "white": {
+                    "type": "string",
+                    "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
+                },
+                "black": {
+                    "type": "string",
+                    "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "variation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/move"
+                    }
+                }
+            },
+            "required": [
+                "turn"
+            ]
+        }
+    }
+}
