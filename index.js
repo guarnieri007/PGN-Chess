@@ -1,31 +1,75 @@
 const fs = require("fs");
+const path = require("path");
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
+
+
+const SCHEMA_PATH = path.resolve(__dirname, "chess.schema.json");
+const INPUT_DIR = path.resolve(__dirname, "inputs");
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-const schema = JSON.parse(fs.readFileSync("./chess.schema.json", "utf-8"));
+function loadJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
 
-const validate = ajv.compile(schema);
+function getJsonFilesFromInputDir(inputDir) {
+  if (!fs.existsSync(inputDir)) {
+    return [];
+  }
 
-const data = JSON.parse(fs.readFileSync("./example.json", "utf-8"));
+  return fs
+    .readdirSync(inputDir)
+    .filter((fileName) => fileName.toLowerCase().endsWith(".json"));
+}
 
-const valid = validate(data);
+function formatAjvErrors(errors = []) {
+  return errors
+    .map((error) => {
+      const location = error.instancePath || "/";
+      return `${location} ${error.message}`;
+    })
+    .join("; ");
+}
 
-if (valid) {
-  console.log("✅ JSON is valid!");
-} else {
-  console.log("❌ Error:");
-  validate.errors.forEach(err => {
-    const match = err.instancePath.match(/\/moves\/(\d+)\//);
-    let turnInfo = "";
-    if (match) {
-      const index = parseInt(match[1], 10);
-      const turn = data.moves[index].turn;
-      turnInfo = `\n   Offending value: ${JSON.stringify(data.moves[index])}`;
+function main() {
+  const schema = loadJson(SCHEMA_PATH);
+  const validate = ajv.compile(schema);
+  const jsonFiles = getJsonFilesFromInputDir(INPUT_DIR);
+
+  if (jsonFiles.length === 0) {
+    console.log(`No JSON files found in folder: ${INPUT_DIR}`);
+    return;
+  }
+
+
+  jsonFiles.forEach((fileName) => {
+    const filePath = path.join(INPUT_DIR, fileName);
+
+    try {
+      const data = loadJson(filePath);
+      const valid = validate(data);
+
+      if (valid) {
+        console.log(`\n${fileName} -> ✅ VALID👍`);
+      } else {
+        console.log(`\n${fileName} -> ❌ INVALID👎`);
+        validate.errors.forEach(err => {
+          const match = err.instancePath.match(/\/moves\/(\d+)\//);
+          let turnInfo = "";
+          if (match) {
+            const index = parseInt(match[1], 10);
+            const turn = data.moves[index].turn;
+            turnInfo = `\n   Offending value: ${JSON.stringify(data.moves[index])}`;
+          }
+          console.log(`\n- Error in ${err.instancePath}${turnInfo}\n`);
+        });
+      }
+    } catch (error) {
+      console.log(`\n${fileName} -> INVALID JSON (${error.message})`);
     }
-    console.log(`\n- Error in ${err.instancePath}${turnInfo}\n`);
   });
 }
 
+main();
