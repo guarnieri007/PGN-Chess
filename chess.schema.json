@@ -74,12 +74,18 @@
                     "minimum": 1
                 },
                 "white": {
-                    "type": ["string", "null"],
-                    "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "pattern": "^((?:[NBRQK]?[a-h1-8]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(?:\\s?(?:e\\.p\\.))?([!?]{0,2})?)|(?:O-O)|(?:O-O-O))$"
                 },
                 "black": {
-                    "type": ["string", "null"],
-                    "pattern": "([a-h]?[NBRQK]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(!?|\\?\\?|!\\?|\\?!)?\\s?(?:e\\.p\\.)?)|(O-O)|(O-O-O)"
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "pattern": "^((?:[NBRQK]?[a-h1-8]?x?[a-h][1-8](=?[NBRQK]?)([\\+#]?)(?:\\s?(?:e\\.p\\.))?([!?]{0,2})?)|(?:O-O)|(?:O-O-O))$"
                 },
                 "comment": {
                     "type": "string"
